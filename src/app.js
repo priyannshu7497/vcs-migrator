@@ -3,5 +3,9 @@ console.log("Sync repositories");
 console.log("Sync branches");
 console.log("Sync completed for job:", jobId);
 
-setInterval(() => {}, 1000);
+console.log("App started...");
+
+setInterval(() => {
+  // keep process alive
+}, 1000);
 
