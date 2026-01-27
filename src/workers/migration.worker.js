@@ -1,14 +1,12 @@
-
 exports.process = async (job) => {
-  console.log('Worker started job:', job.id);
-
-  // Simulate steps
-  await new Promise(r => setTimeout(r, 500));
-  console.log('Sync repositories');
+  console.log('[WORKER] Job started:', job.id);
 
   await new Promise(r => setTimeout(r, 500));
-  console.log('Sync branches');
+  console.log('[WORKER] Sync repositories');
 
   await new Promise(r => setTimeout(r, 500));
-  console.log('Sync completed for job:', job.id);
+  console.log('[WORKER] Sync branches');
+
+  await new Promise(r => setTimeout(r, 500));
+  console.log('[WORKER] Job completed:', job.id);
 };
