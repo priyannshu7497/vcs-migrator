@@ -1,12 +1,12 @@
-exports.process = async (job) => {
-  console.log('[WORKER] Job started:', job.id);
+const queue = require('../utils/fakeQueue');
 
-  await new Promise(r => setTimeout(r, 500));
-  console.log('[WORKER] Sync repositories');
+console.log('🧵 Migration worker started...');
 
-  await new Promise(r => setTimeout(r, 500));
-  console.log('[WORKER] Sync branches');
+queue.processJobs(async (job) => {
+  console.log(`🚀 Starting migration job ${job.id}`);
+  console.log(`🔁 Migrating from ${job.source} to ${job.target}`);
 
-  await new Promise(r => setTimeout(r, 500));
-  console.log('[WORKER] Job completed:', job.id);
-};
+  await new Promise(resolve => setTimeout(resolve, 3000));
+
+  console.log(`✅ Migration completed for job ${job.id}`);
+});
