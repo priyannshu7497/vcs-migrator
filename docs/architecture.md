@@ -1,85 +1,172 @@
-# VCS Migrator – Architecture Document
+# Git Repository Migrator
 
-## Overview
-VCS Migrator is a web-based system designed to migrate complete repositories and their components
-from one version control provider to another (e.g., GitLab → GitHub, Bitbucket → GitHub).
-The system is built using a modular, queue-based architecture to ensure scalability,
-fault tolerance, and non-blocking operations.
+A web-based system to migrate Git repositories and related metadata across multiple Version Control System (VCS) providers such as **GitHub**, **GitLab**, and **Bitbucket** in a controlled, extensible, and reliable manner.
 
 ---
 
-## High-Level Architecture
+## 1. Problem Statement
 
-User → Web/API Layer → Controller → Service Layer → Queue → Worker → Target VCS
+Modern organizations often need to migrate repositories from one Version Control System (VCS) provider to another due to:
 
----
+- Cost optimization  
+- Compliance requirements  
+- Platform standardization  
 
-## Components
+However, VCS migration is complex because each provider exposes different:
 
-### 1. Web/API Layer
-- Built using Node.js and Express.
-- Exposes REST APIs to initiate migration requests.
-- Handles request validation and response formatting.
+- APIs  
+- Authentication mechanisms  
+- Repository and metadata models  
 
-### 2. Controller Layer
-- Receives incoming API requests.
-- Delegates business logic to the service layer.
-- Ensures separation of concerns.
-
-### 3. Service Layer
-- Core business logic of migration.
-- Creates migration jobs and pushes them to the queue.
-- Responsible for deciding what needs to be migrated (repositories, branches, tags, etc.).
-
-### 4. Queue System
-- Acts as a buffer between API and migration execution.
-- Current implementation uses an in-memory queue for demo purposes.
-- Designed to be replaceable with Redis, SQS, or RabbitMQ in production.
-
-### 5. Worker
-- Background process that consumes jobs from the queue.
-- Executes migration logic asynchronously.
-- Prevents blocking of API requests during long-running migrations.
+This project aims to solve these challenges by providing a **web-based Git Migrator** capable of migrating repositories and selected metadata across multiple providers in a structured and extensible way.
 
 ---
 
-## Data Flow
+## 2. High-Level Architecture
 
-1. User triggers migration via API.
-2. API validates request and sends it to controller.
-3. Service creates a migration job and queues it.
-4. Worker picks the job from the queue.
-5. Migration is executed in background.
-6. Status is logged and reported.
++------------------+
+| Web UI |
+| (HTML / Forms) |
++--------+---------+
+|
+v
++------------------+
+| Backend API |
+| (FastAPI) |
++--------+---------+
+|
+v
++------------------+
+| Migration Engine |
+| (Git + APIs) |
++--------+---------+
+|
+v
++-----------------------------+
+| Git Providers |
+| GitHub | GitLab | Bitbucket |
++-----------------------------+
+
+yaml
+Copy code
+
+### Architecture Overview
+
+- **Web UI** handles user interaction  
+- **Backend API** manages validation and orchestration  
+- **Migration Engine** performs actual Git and API operations  
+- **Providers** abstract external VCS platforms  
 
 ---
 
-## Scalability & Future Enhancements
+## 3. Component Breakdown
 
-- Replace in-memory queue with Redis-based queue.
-- Support multiple concurrent workers.
-- Add retry and failure handling mechanisms.
-- Introduce event-based status updates.
-- Implement role-based access control.
+### 3.1 Web UI (Presentation Layer)
 
----
+**Responsibilities**
+- Collect source and target provider details  
+- Accept authentication tokens  
+- Allow users to choose migration options  
+- Display migration status and progress  
 
-## Security Considerations
-
-- OAuth tokens for GitHub, GitLab, and Bitbucket.
-- Secrets managed via environment variables.
-- Token encryption for stored credentials.
+**Design Decision**
+- UI does **not** communicate directly with Git providers  
+- All interactions go through the Backend API  
 
 ---
 
-## Deployment Strategy
+### 3.2 Backend API (Application Layer)
 
-- Containerized using Docker.
-- Can be deployed on Kubernetes or cloud VM.
-- Separate services for API and worker in production.
+**Responsibilities**
+- Request validation  
+- Authentication handling  
+- Triggering migration workflows  
+- Tracking migration progress  
+
+**Key Design Choice**
+- Migration runs **asynchronously** to avoid blocking the UI  
 
 ---
 
-## Conclusion
-This architecture ensures modularity, scalability, and clean separation of responsibilities,
-making the system suitable for enterprise-grade migration use cases.
+### 3.3 Migration Engine (Core Layer)
+
+**Responsibilities**
+- Interact with Git provider APIs  
+- Execute Git operations (clone, fetch, push)  
+- Handle retries and failures  
+- Ensure idempotent operations  
+
+This layer acts as the **core brain** of the system.
+
+---
+
+## 4. Data Flow
+
+### Migration Lifecycle
+
+1. User submits migration request via Web UI  
+2. Backend validates request and credentials  
+3. Migration Engine performs repository migration  
+4. Status and logs are stored  
+5. UI polls Backend API for progress updates  
+
+---
+
+## 5. Technology Stack
+
+| Layer              | Technology            |
+|-------------------|-----------------------|
+| Frontend (UI)      | HTML, CSS, JavaScript |
+| Backend API        | FastAPI (Python)      |
+| Migration Engine   | Git CLI + REST APIs   |
+| Authentication     | Personal Access Tokens|
+| Deployment         | Docker (Planned)      |
+
+---
+
+## 6. Security Considerations
+
+- Personal Access Tokens are **never logged**  
+- Tokens use **minimum required scopes**  
+- Sensitive data flows **only via backend**  
+- HTTPS enforced in deployment environments  
+
+---
+
+## 7. Scalability & Extensibility
+
+- Stateless backend enables **horizontal scaling**  
+- Provider abstraction allows easy onboarding of new VCS platforms  
+- Migration engine designed as a **modular service**  
+- Scheduler can be replaced with job queues (future scope)  
+- Supports incremental and selective migration design  
+
+---
+
+### Additional Design Notes
+
+**Provider Abstraction**
+GitProvider (Interface)
+├── GitHubProvider
+├── GitLabProvider
+└── BitbucketProvider
+
+yaml
+Copy code
+
+Each provider implements:
+- Authentication validation  
+- Repository creation  
+- Branch and tag handling  
+- Metadata extraction  
+
+---
+
+### Future Enhancements
+
+- Pull Requests and Issues migration  
+- Webhook-based incremental sync  
+- Role-Based Access Control (RBAC)  
+- Multi-tenant support  
+
+---
