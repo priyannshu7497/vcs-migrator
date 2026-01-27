@@ -1,3 +1,5 @@
+require('./workers/migration.worker');
+
 const express = require('express');
 const dotenv = require('dotenv');
 const migrationRoutes = require('./routes/migration.routes');
