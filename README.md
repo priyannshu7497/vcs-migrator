@@ -1,9 +1,6 @@
 # vcs-migrator
+Project intro
 
-Project overview
+Docs links
 
-How to run
-
-Link to docs folder
-
-Deployment link
+Setup steps
