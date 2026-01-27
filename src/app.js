@@ -1,11 +1,16 @@
-console.log("Worker started job:", jobId);
-console.log("Sync repositories");
-console.log("Sync branches");
-console.log("Sync completed for job:", jobId);
+const express = require('express');
+const dotenv = require('dotenv');
+const migrationRoutes = require('./routes/migration.routes');
 
-console.log("App started...");
+dotenv.config();
 
-setInterval(() => {
-  // keep process alive
-}, 1000);
+const app = express();
+app.use(express.json());
 
+app.use('/migrations', migrationRoutes);
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
