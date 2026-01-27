@@ -1,9 +1,17 @@
+const queue = require('../utils/fakeQueue');
 
 exports.startMigration = async (payload) => {
-  return {
-    status: 'started',
+  const job = {
+    id: Date.now(),
     source: payload.source,
-    target: payload.target,
-    message: 'Migration job created successfully'
+    target: payload.target
+  };
+
+  queue.addJob(job);
+
+  return {
+    status: 'queued',
+    jobId: job.id,
+    message: 'Migration job queued successfully'
   };
 };
