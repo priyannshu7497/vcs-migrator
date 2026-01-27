@@ -1,3 +1,11 @@
+router.get('/test', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Migration API is working'
+  });
+});
+
+
 const express = require('express');
 const router = express.Router();
 
