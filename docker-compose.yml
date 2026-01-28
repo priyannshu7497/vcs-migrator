@@ -2,22 +2,26 @@ version: "3.9"
 
 services:
   api:
-    image: python:3.11
+    build: .
     working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - .:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - redis
 
   worker:
-    image: python:3.11
+    build: .
     working_dir: /app
+    command: celery -A app.workers.migration_worker.celery_app worker --loglevel=info
     volumes:
       - .:/app
-    command: celery -A app.workers.migration_worker worker --loglevel=info
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - redis
 
