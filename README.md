@@ -1,13 +1,18 @@
-# VCS Migrator (Python)
+# VCS Migrator Tool
 
-This project demonstrates a VCS migration system using
-FastAPI, Celery, and Redis.
+A comprehensive solution to migrate repositories between GitLab, GitHub, and BitBucket.
 
-The API accepts migration requests and processes them
-as background jobs using workers.
+## Features
+- **Manual & Scheduled Sync**
+- **Granular Migration**: Branches, Tags, PRs, and Issues.
+- **Async Processing**: Powered by FastAPI, Celery, and Redis.
 
-## Run using Docker
-docker-compose up --build
+## Architecture
+1. **Frontend**: FastAPI Swagger UI (built-in).
+2. **Backend**: Python FastAPI.
+3. **Task Queue**: Celery with Redis.
+4. **Containerization**: Docker & Docker Compose.
 
-## API
-POST /migrations/migrate
+## How to Run
+1. `docker-compose up --build`
+2. Access API at `http://localhost:8000/docs`
