@@ -2,5 +2,7 @@ fastapi
 uvicorn
 celery
 redis
-gitpython
-pydantic
+python-gitlab
+PyGithub
+python-dotenv
+requests
